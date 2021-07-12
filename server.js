@@ -3,6 +3,7 @@ const fs = require('fs');
 const inquirer = require('inquirer');
 const express = require('express');
 const mysql = require('mysql2');
+const Connection = require('mysql2/typings/mysql/lib/Connection');
 
 // Set the port number
 const PORT = process.env.PORT || 3001;
@@ -16,7 +17,6 @@ app.use(express.json());
 const db = mysql.createConnection(
   {
     host: 'localhost',
-
     // ENTER MySQL USERNAME HERE!
     user: 'root',
     // ENTER MySQL PASSWORD HERE
@@ -26,62 +26,60 @@ const db = mysql.createConnection(
   console.log(`Connected to the employee_tracker database.`)
 );
 
-const newQuestions = () => {
-    return inquirer.prompt([
-
-        // First name section
-        {
-            type: 'input',
-            name: 'first_name',
-            message: `Please enter this employee's first name.`
-        },
-        // Last name section
-        {
-            type: 'input',
-            name: 'last_name',
-            message: `Please enter this employee's last name.`
-        }
-        
-    ]).then(function(answers) {
-      let id;
-      for (let i = 0; i < res.length; i++) {
-        if (res[a].title == answers.role) {
-          id = res[a].id;
-          console.log(id);
-        }
+// 
+const employeeQuestions = () => {
+  return inquirer.prompt([
+    // First name input
+    {
+      type: 'input',
+      name: 'first_name',
+      message: `Please enter this employee's first name.`
+    },
+    // Last name input
+    {
+      type: 'input',
+      name: 'last_name',
+      message: `Please enter this employee's last name.`
+    }
+  ]).then(function(answers) {
+    let id;
+    for (let i = 0; i < res.length; i++) {
+      if (res[a].title == answers.role) {
+        id = res[a].id;
+        console.log(id);
       }
-    })
-
-    // send data to generateMarkdown.js
-    .then(data => {
-        return generateMarkdown(data);
-    })
-
-    // name the file to README.md
-    .then(generatedReadme => {
-        return writeToFile('README.md', generatedReadme);
-    })
-    
-    // log error is any occur
-    .catch(err => {
-        console.log(err);
-    })
+    }
+    Connection.query(
+      {
+        first_name: answers.first_name,
+        last_name: answers.last_name,
+        id: id
+      }
+    )
+  })
 };
 
-// write readme file into ./generated folder
-const writeToFile = (fileName, data) => {
-    fs.writeFile(`./generated/${fileName}`, data, err => {
-        if (err) {
-            throw err;
-        } else {
-            console.log('Your README.md file has been generated.')
-        }
-    });
-};
+// 
+const departmentQuestions = () => {
+  return inquirer.prompt([
+    // New department input
+    {
+      type: 'input',
+      name: 'new_department',
+      message: `Please enter the name of the new department.`
+    }
+  ]).then(function(answers) {
+    Connection.query(
+      {
+        new_department: answers.new_department
+      }
+    )
+  })
+}
 
-// begin newQuestions
+// begin employeeQuestions
 const init = () => {
-    newQuestions();
+    employeeQuestions();
 };
 
 // call to start app
