@@ -26,8 +26,56 @@ const db = mysql.createConnection(
   console.log(`Connected to the employee_tracker database.`)
 );
 
+// Create user interface
+const userInterface = () => {
+  return inquirer.prompt([
+    // Interface options
+    {
+      type: 'list',
+      message: 'What would you like to do?',
+      name: 'user_selection',
+      choices: [
+        'View All Employees',
+        'View All Employees By Department', 
+        'View All Employees By Manager', 
+        'Add Employee', 
+        'Remove Employee', 
+        'Update Employee Role',
+        'Update Employee Manger',
+        'View All roles',
+        'Add Role',
+        'Remove Role'
+      ]
+    }
+  // Select function based on user's input
+  ]).then(function(answers) {
+    switch(answers.user_selection) {
+      case 'View All Employees': viewEmployees();
+      break;
+      case 'View All Employees By Department': viewDepartment(); 
+      break;
+      case 'View All Employees By Manager': viewManager();
+      break;
+      case 'Add Employee': addEmployee();
+      break;
+      case 'Remove Employee': removeEmployee(); 
+      break;
+      case 'Update Employee Role': updateRole();
+      break;
+      case 'Update Employee Manger': updateManager();
+      break;
+      case 'View All roles': viewRoles();
+      break;
+      case 'Add Role': addRole();
+      break;
+      case 'Remove Role': removeRole();
+      break;
+    }
+  });
+};
+
 // Create a new employee and assign them an ID
-const employeeQuestions = () => {
+const addEmployee = () => {
   return inquirer.prompt([
     // First name input
     {
@@ -40,6 +88,17 @@ const employeeQuestions = () => {
       type: 'input',
       name: 'last_name',
       message: `Please enter this employee's last name.`
+    },
+    {
+      type: 'input',
+      name: 'department',
+      message: `Please enter the name of their department.`
+    },
+    // Department manager input
+    {
+      type: 'input',
+      name: 'manager',
+      message: `Please enter the name of their manager.`
     }
   // Assign ID to new employee
   ]).then(function(answers) {
@@ -54,6 +113,8 @@ const employeeQuestions = () => {
       {
         first_name: answers.first_name,
         last_name: answers.last_name,
+        department: answers.department,
+        manager: answers.manager,
         id: id
       }
     );
@@ -61,7 +122,7 @@ const employeeQuestions = () => {
 };
 
 // Create new title and salary
-const titleQuestions = () => {
+const addRole = () => {
   return inquirer.prompt([
     // New title input
     {
@@ -85,34 +146,9 @@ const titleQuestions = () => {
   });
 };
 
-// Create a new department
-const departmentQuestions = () => {
-  return inquirer.prompt([
-    // New department input
-    {
-      type: 'input',
-      name: 'new_department',
-      message: `Please enter the name of the new department.`
-    },
-    // Department manager input input
-    {
-      type: 'input',
-      name: 'dep_manager',
-      message: `Please enter the name of the manager for this department.`
-    }
-  ]).then(function(answers) {
-    Connection.query(
-      {
-        new_department: answers.new_department,
-        dep_manager: answers.dep_manager
-      }
-    );
-  });
-};
-
 // begin employeeQuestions
 const init = () => {
-  employeeQuestions();
+  userInterface();
 };
 
 // call to start app
