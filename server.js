@@ -33,7 +33,7 @@ const userInterface = () => {
     {
       type: 'list',
       message: 'What would you like to do?',
-      name: 'user_selection',
+      name: 'userSelection',
       choices: [
         'View All Employees',
         'View All Employees By Department', 
@@ -49,7 +49,7 @@ const userInterface = () => {
     }
   // Select function based on user's input
   ]).then(function(answers) {
-    switch(answers.user_selection) {
+    switch(answers.userSelection) {
       case 'View All Employees': viewEmployees();
       break;
       case 'View All Employees By Department': viewDepartment(); 
@@ -74,19 +74,33 @@ const userInterface = () => {
   });
 };
 
+// View all employees in the database
+const viewEmployees = () => {
+
+};
+
+// View employees by department
+const viewDepartment = () => {
+
+};
+
+// View employees by manager
+const viewManager= () => {
+
+};
+
 // Create a new employee and assign them an ID
 const addEmployee = () => {
   return inquirer.prompt([
-    // First name input
+    // Employee form section
     {
       type: 'input',
-      name: 'first_name',
+      name: 'firstName',
       message: `Please enter this employee's first name.`
     },
-    // Last name input
     {
       type: 'input',
-      name: 'last_name',
+      name: 'lastName',
       message: `Please enter this employee's last name.`
     },
     {
@@ -94,7 +108,6 @@ const addEmployee = () => {
       name: 'department',
       message: `Please enter the name of their department.`
     },
-    // Department manager input
     {
       type: 'input',
       name: 'manager',
@@ -111,8 +124,8 @@ const addEmployee = () => {
     }
     Connection.query(
       {
-        first_name: answers.first_name,
-        last_name: answers.last_name,
+        firstName: answers.firstName,
+        lastName: answers.lastName,
         department: answers.department,
         manager: answers.manager,
         id: id
@@ -121,35 +134,60 @@ const addEmployee = () => {
   });
 };
 
+// Remove employee form the database
+const removeEmployee = () => {
+
+};
+
+// Update an employee's role
+const updateRole = () => {
+
+};
+
+// Update an employee's manager
+const updateManager = () => {
+
+};
+
+// View the currently created roles
+const viewRoles = () => {
+
+};
+
 // Create new title and salary
 const addRole = () => {
   return inquirer.prompt([
     // New title input
     {
       type: 'input',
-      name: 'new_title',
+      name: 'newRole',
       message: `Please enter the name of the new title.`
     },
     // New salary input
     {
       type: 'input',
-      name: 'new_salary',
+      name: 'newSalary',
       message: `Please enter the salary for this new title.`
     },
   ]).then(function(answers) {
     Connection.query(
       {
-        new_title: answers.new_title,
-        new_salary: answers.new_salary
+        newRole: answers.newRole,
+        newSalary: answers.newSalary
       }
     );
   });
 };
 
-// begin employeeQuestions
+// Remove a role from the database
+const removeRole = () => {
+
+};
+
+// Call the userInterface function when the program initializes
 const init = () => {
   userInterface();
 };
 
-// call to start app
+// Call the init function to start app
 init();
