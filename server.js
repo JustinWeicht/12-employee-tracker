@@ -80,12 +80,13 @@ const viewEmployees = () => {
 };
 
 // View employees by department
+// TODO: ADD COMBINED SALARIES OF SELECTED DEPARTMENT
 const viewDepartment = () => {
 
 };
 
 // View employees by manager
-const viewManager= () => {
+const viewManager = () => {
 
 };
 
@@ -104,31 +105,30 @@ const addEmployee = () => {
       message: `Please enter this employee's last name.`
     },
     {
-      type: 'input',
-      name: 'department',
-      message: `Please enter the name of their department.`
+      type: 'list',
+      name: 'mangerId',
+      message: `Please enter their manager's ID number.`,
+      choices: ''
     },
     {
-      type: 'input',
-      name: 'manager',
-      message: `Please enter the name of their manager.`
-    }
+      type: 'list',
+      name: 'role',
+      message: `Please select the title of this employee.`
+    },
   // Assign ID to new employee
   ]).then(function(answers) {
-    let id;
+    let role_id;
     for (let i = 0; i < res.length; i++) {
-      if (res[a].title == answers.role) {
-        id = res[a].id;
-        console.log(id);
+      if (res[i].title == answers.role) {
+        role_id = res[i].id;
       }
     }
     Connection.query(
       {
-        firstName: answers.firstName,
-        lastName: answers.lastName,
-        department: answers.department,
-        manager: answers.manager,
-        id: id
+        first_name: answers.firstName,
+        last_name: answers.lastName,
+        manager_id: answers.managerId,
+        role_id: roleId
       }
     );
   });
@@ -160,7 +160,7 @@ const addRole = () => {
     // New title input
     {
       type: 'input',
-      name: 'newRole',
+      name: 'newTitle',
       message: `Please enter the name of the new title.`
     },
     // New salary input
@@ -172,8 +172,8 @@ const addRole = () => {
   ]).then(function(answers) {
     Connection.query(
       {
-        newRole: answers.newRole,
-        newSalary: answers.newSalary
+        title: answers.newRole,
+        salary: answers.newSalary
       }
     );
   });

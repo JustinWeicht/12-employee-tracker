@@ -7,17 +7,21 @@ CREATE DATABASE employee_tracker;
 CREATE TABLE employee (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
-  last_name VARCHAR(30) NOT NULL
+  last_name VARCHAR(30) NOT NULL,
+  role_id INT NOT NULL,
+  manager_id INT NOT NULL
 );
 
 -- Creates the "title" table
-CREATE TABLE title (
+CREATE TABLE role (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  employee_title VARCHAR(30) NOT NULL
+  title VARCHAR(30) NOT NULL,
+  salary DECIMAL NOT NULL,
+  department_id INT NOT NULL
 );
 
 -- Creates the "title" table
 CREATE TABLE department (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  employee_department VARCHAR(30) NOT NULL
+  name VARCHAR(30) NOT NULL
 );
