@@ -74,20 +74,45 @@ const userInterface = () => {
   });
 };
 
+// Array creation function
+// Create array for role_id
+let roleIdArray = [];
+  for(let i = 0; i < res.length; i++) {
+    roleIdArray.push(res[i].title);
+  };
+
+// Create array for department_id
+let depIdArray = [];
+  for(let i = 0; i < res.length; i++) {
+    depIdArray.push(res[i].title);
+  };
+
+// Function calls from userInterface
 // View all employees in the database
 const viewEmployees = () => {
-
+  var query = 'SELECT * FROM employees';
+  connection.query(query, function(err, res) {
+      if(err)throw err;
+      console.table('All Employees:', res);
+  })
 };
 
 // View employees by department
 // TODO: ADD COMBINED SALARIES OF SELECTED DEPARTMENT
 const viewDepartment = () => {
-
+  var query = 'SELECT * FROM department';
+  connection.query(query, function(err, res) {
+      if(err)throw err;
+      console.table('All Departments:', res);
+  })
 };
 
 // View employees by manager
 const viewManager = () => {
-
+  var query = 'SELECT * FROM manager';
+  connection.query(query, function(err, res) {
+      if(err)throw err;
+      console.table('All Managers:', res);
 };
 
 // Create a new employee and assign them an ID
@@ -105,30 +130,24 @@ const addEmployee = () => {
       message: `Please enter this employee's last name.`
     },
     {
-      type: 'list',
+      type: 'input',
       name: 'mangerId',
-      message: `Please enter their manager's ID number.`,
-      choices: ''
+      message: `Please enter their manager's ID number.`
     },
     {
       type: 'list',
       name: 'role',
-      message: `Please select the title of this employee.`
-    },
-  // Assign ID to new employee
-  ]).then(function(answers) {
-    let role_id;
-    for (let i = 0; i < res.length; i++) {
-      if (res[i].title == answers.role) {
-        role_id = res[i].id;
-      }
+      message: `Please select the title of this employee.`,
+      choices: roleIdArray()
     }
+  // Assign ID to new employee
+  ]).then(function(answers) {   
     Connection.query(
       {
         first_name: answers.firstName,
         last_name: answers.lastName,
         manager_id: answers.managerId,
-        role_id: roleId
+        role_id: roleIdArray()
       }
     );
   });
@@ -151,7 +170,11 @@ const updateManager = () => {
 
 // View the currently created roles
 const viewRoles = () => {
-
+  var query = 'SELECT * FROM role';
+  connection.query(query, function(err, res){
+    if (err) throw err;
+    console.table('All Roles:', res);
+  });
 };
 
 // Create new title and salary
