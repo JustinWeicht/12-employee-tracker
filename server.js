@@ -90,7 +90,7 @@ let depIdArray = [];
 // Function calls from userInterface
 // View all employees in the database
 const viewEmployees = () => {
-  var query = 'SELECT * FROM employees';
+  const query = 'SELECT * FROM employee';
   connection.query(query, function(err, res) {
       if(err)throw err;
       console.table('All Employees:', res);
@@ -100,7 +100,7 @@ const viewEmployees = () => {
 // View employees by department
 // TODO: ADD COMBINED SALARIES OF SELECTED DEPARTMENT
 const viewDepartment = () => {
-  var query = 'SELECT * FROM department';
+  const query = 'SELECT * FROM department';
   connection.query(query, function(err, res) {
       if(err)throw err;
       console.table('All Departments:', res);
@@ -109,7 +109,7 @@ const viewDepartment = () => {
 
 // View employees by manager
 const viewManager = () => {
-  var query = 'SELECT * FROM manager';
+  const query = 'SELECT * FROM manager';
   connection.query(query, function(err, res) {
       if(err)throw err;
       console.table('All Managers:', res);
@@ -171,7 +171,7 @@ const updateManager = () => {
 
 // View the currently created roles
 const viewRoles = () => {
-  var query = 'SELECT * FROM role';
+  const query = 'SELECT * FROM role';
   connection.query(query, function(err, res){
     if (err) throw err;
     console.table('All Roles:', res);
