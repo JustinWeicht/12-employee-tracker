@@ -113,6 +113,7 @@ const viewManager = () => {
   connection.query(query, function(err, res) {
       if(err)throw err;
       console.table('All Managers:', res);
+});
 };
 
 // Create a new employee and assign them an ID
