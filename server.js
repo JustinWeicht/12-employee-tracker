@@ -1,9 +1,8 @@
 // Import and require packages
-const fs = require('fs');
 const inquirer = require('inquirer');
 const express = require('express');
 const mysql = require('mysql2');
-const Connection = require('mysql2/typings/mysql/lib/Connection');
+const connection = require('mysql2/typings/mysql/lib/Connection');
 
 // Set the port number
 const PORT = process.env.PORT || 3001;
@@ -77,15 +76,23 @@ const userInterface = () => {
 // Array creation function
 // Create array for role_id
 let roleIdArray = [];
+connection.query("SELECT * FROM role", function(err, res) {
   for(let i = 0; i < res.length; i++) {
     roleIdArray.push(res[i].title);
   };
+  return roleIdArray();
+});
+  
 
 // Create array for department_id
 let depIdArray = [];
+connection.query("SELECT * FROM department", function(err, res) {
   for(let i = 0; i < res.length; i++) {
     depIdArray.push(res[i].title);
   };
+  return depIdArray();
+});
+  
 
 // Function calls from userInterface
 // View all employees in the database
