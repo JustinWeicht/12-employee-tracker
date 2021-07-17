@@ -13,13 +13,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/JustinWeicht/12-employee-tracker/issues"
   },
   "homepage": "https://github.com/JustinWeicht/12-employee-tracker#readme",
   "dependencies": {
-    "express": "^4.17.1",
+    "console.table": "^0.10.0",
     "inquirer": "^8.1.1",
     "mysql2": "^2.2.5"
   },

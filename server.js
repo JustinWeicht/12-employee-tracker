@@ -1,21 +1,13 @@
 // Import and require packages
 const inquirer = require('inquirer');
-const express = require('express');
 const mysql = require('mysql2');
-const connection = require('mysql2/typings/mysql/lib/Connection');
-
-// Set the port number
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-// Express middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const consoleTable = require('console.table');
 
 // Connect to database
 const db = mysql.createConnection(
   {
     host: 'localhost',
+    port: 3306,
     // ENTER MySQL USERNAME HERE!
     user: 'root',
     // ENTER MySQL PASSWORD HERE!
@@ -33,17 +25,15 @@ const userInterface = () => {
       type: 'list',
       message: 'What would you like to do?',
       name: 'userSelection',
-      choices: [
+      choices: [ 
         'View All Employees',
-        'View All Employees By Department', 
-        'View All Employees By Manager', 
+        'View All Departments',
+        'View All Roles',
         'Add Employee', 
-        'Remove Employee', 
-        'Update Employee Role',
-        'Update Employee Manger',
-        'View All roles',
+        'Add Department',
         'Add Role',
-        'Remove Role'
+        'Update Employee Role',
+        'Remove Employee'
       ]
     }
   // Select function based on user's input
@@ -51,76 +41,66 @@ const userInterface = () => {
     switch(answers.userSelection) {
       case 'View All Employees': viewEmployees();
       break;
-      case 'View All Employees By Department': viewDepartment(); 
+      case 'View All Departments': viewDepartments();
       break;
-      case 'View All Employees By Manager': viewManager();
+      case 'View All Roles': viewRoles();
       break;
       case 'Add Employee': addEmployee();
       break;
-      case 'Remove Employee': removeEmployee(); 
-      break;
-      case 'Update Employee Role': updateRole();
-      break;
-      case 'Update Employee Manger': updateManager();
-      break;
-      case 'View All roles': viewRoles();
+      case 'Add Department': addDepartment();
       break;
       case 'Add Role': addRole();
       break;
-      case 'Remove Role': removeRole();
+      case 'Update Employee Role': updateRole();
+      break;
+      case 'Remove Employee': removeEmployee(); 
       break;
     }
   });
 };
 
-// Array creation function
-// Create array for role_id
-let roleIdArray = [];
-connection.query("SELECT * FROM role", function(err, res) {
-  for(let i = 0; i < res.length; i++) {
-    roleIdArray.push(res[i].title);
-  };
-  return roleIdArray();
-});
-  
-
-// Create array for department_id
-let depIdArray = [];
-connection.query("SELECT * FROM department", function(err, res) {
-  for(let i = 0; i < res.length; i++) {
-    depIdArray.push(res[i].title);
-  };
-  return depIdArray();
-});
-  
-
 // Function calls from userInterface
 // View all employees in the database
 const viewEmployees = () => {
-  const query = 'SELECT * FROM employee';
-  connection.query(query, function(err, res) {
-      if(err)throw err;
-      console.table('All Employees:', res);
+  db.query(`SELECT employee.first_name AS 'First Name', 
+  employee.last_name AS 'Last Name', 
+  role.title AS Title, role.salary AS Salary, 
+  department.name AS Department, 
+  CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee 
+  INNER JOIN role on role.id = employee.role_id 
+  INNER JOIN department on department.id = role.department_id 
+  LEFT JOIN employee e on employee.manager_id = e.id;`, 
+  function(err, res) {
+    if(err)throw err;
+    console.table('All Employees:', res);
+    userInterface();
   })
 };
 
 // View employees by department
 // TODO: ADD COMBINED SALARIES OF SELECTED DEPARTMENT
-const viewDepartment = () => {
-  const query = 'SELECT * FROM department';
-  connection.query(query, function(err, res) {
-      if(err)throw err;
-      console.table('All Departments:', res);
+const viewDepartments = () => {
+  db.query(`SELECT department.id, 
+  department.name AS Department FROM department`, 
+  function(err, res) {
+    if(err)throw err;
+    console.table('All Departments:', res);
+    userInterface();
   })
 };
 
-// View employees by manager
-const viewManager = () => {
-  const query = 'SELECT * FROM manager';
-  connection.query(query, function(err, res) {
-      if(err)throw err;
-      console.table('All Managers:', res);
-});
+// View the currently created roles
+const viewRoles = () => {
+  db.query(`SELECT role.id, 
+  role.title AS Title, 
+  role.salary AS Salary, 
+  department.name AS Department FROM role 
+  INNER JOIN department on department.id = role.department_id`, 
+  function(err, res){
+    if (err) throw err;
+    console.table('All Roles:', res);
+    userInterface();
+  });
 };
 
 // Create a new employee and assign them an ID
@@ -140,49 +120,28 @@ const addEmployee = () => {
     {
       type: 'input',
       name: 'mangerId',
-      message: `Please enter their manager's ID number.`
+      message: managerChoices()
     },
     {
       type: 'list',
       name: 'role',
       message: `Please select the title of this employee.`,
-      choices: roleIdArray()
+      choices: roleChoices()
     }
   // Assign ID to new employee
-  ]).then(function(answers) {   
-    Connection.query(
+  ]).then(function(answers) {
+    db.query(
+      'INSERT INTO employee SET ?', 
       {
         first_name: answers.firstName,
         last_name: answers.lastName,
         manager_id: answers.managerId,
-        role_id: roleIdArray()
+        role_id: roleId()
       }
     );
+    userInterface();
   });
-};
-
-// Remove employee form the database
-const removeEmployee = () => {
-
-};
-
-// Update an employee's role
-const updateRole = () => {
-
-};
-
-// Update an employee's manager
-const updateManager = () => {
-
-};
-
-// View the currently created roles
-const viewRoles = () => {
-  const query = 'SELECT * FROM role';
-  connection.query(query, function(err, res){
-    if (err) throw err;
-    console.table('All Roles:', res);
-  });
+  
 };
 
 // Create new title and salary
@@ -200,18 +159,53 @@ const addRole = () => {
       name: 'newSalary',
       message: `Please enter the salary for this new title.`
     },
+    // Department input
+    {
+      type: 'list',
+      name: 'inDepartment',
+      message: `Please select which department this new role belongs to.`,
+      choices: departmentChoices()
+    },
   ]).then(function(answers) {
-    Connection.query(
+    db.query(
+      'INSERT INTO role SET ?',
       {
         title: answers.newRole,
         salary: answers.newSalary
       }
     );
+    userInterface();
   });
 };
 
-// Remove a role from the database
-const removeRole = () => {
+const addDepartment = () => {
+  return inquirer.prompt([
+    // Employee form section
+    {
+      type: 'input',
+      name: 'newDepartment',
+      message: `Please enter the name of the new department.`
+    }
+  // Assign ID to new employee
+  ]).then(function(answers) {
+    db.query(
+      'INSERT INTO department SET ?', 
+      {
+        name: answers.newDepartment
+      }
+    );
+    userInterface();
+  });
+};
+
+// Update an employee's role
+const updateRole = () => {
+
+};
+
+
+// Remove employee form the database
+const removeEmployee = () => {
 
 };
 
