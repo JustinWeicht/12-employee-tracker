@@ -130,8 +130,7 @@ const addEmployee = () => {
     }
   // Assign ID to new employee
   ]).then(function(answers) {
-    db.query(
-      'INSERT INTO employee SET ?', 
+    db.query('INSERT INTO employee SET ?', 
       {
         first_name: answers.firstName,
         last_name: answers.lastName,
@@ -167,8 +166,7 @@ const addRole = () => {
       choices: departmentChoices()
     },
   ]).then(function(answers) {
-    db.query(
-      'INSERT INTO role SET ?',
+    db.query('INSERT INTO role SET ?',
       {
         title: answers.newRole,
         salary: answers.newSalary
@@ -188,25 +186,32 @@ const addDepartment = () => {
     }
   // Assign ID to new employee
   ]).then(function(answers) {
-    db.query(
-      'INSERT INTO department SET ?', 
-      {
-        name: answers.newDepartment
-      }
-    );
+    db.query('INSERT INTO department SET ?', {name: answers.newDepartment});
     userInterface();
   });
 };
 
 // Update an employee's role
 const updateRole = () => {
-
+  userInterface()
 };
 
 
 // Remove employee form the database
 const removeEmployee = () => {
-
+  return inquirer.prompt([
+    {
+      name: "removeId",
+      type: "input",
+      message: "Please enter the ID of the employee you would like to remove."
+    }
+  ]).then(function(answer) {
+    db.query('DELETE FROM employee WHERE ?', {id: answer.removeId}, function(err) {
+      if (err) throw err;
+  });
+  console.log('Employee has been successfully removed.');
+  userInterface();
+  }); 
 };
 
 // Call the userInterface function when the program initializes
