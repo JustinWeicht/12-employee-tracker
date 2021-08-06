@@ -26,12 +26,12 @@ const userInterface = () => {
       message: 'What would you like to do?',
       name: 'userSelection',
       choices: [ 
-        'View All Employees',
         'View All Departments',
         'View All Roles',
-        'Add Employee', 
+        'View All Employees',
         'Add Department',
         'Add Role',
+        'Add Employee', 
         'Update Employee Role',
         'Remove Employee'
       ]
@@ -39,17 +39,17 @@ const userInterface = () => {
   // Select function based on user's input
   ]).then(function(answers) {
     switch(answers.userSelection) {
-      case 'View All Employees': viewEmployees();
-      break;
       case 'View All Departments': viewDepartments();
       break;
       case 'View All Roles': viewRoles();
       break;
-      case 'Add Employee': addEmployee();
+      case 'View All Employees': viewEmployees();
       break;
       case 'Add Department': addDepartment();
       break;
       case 'Add Role': addRole();
+      break;
+      case 'Add Employee': addEmployee();
       break;
       case 'Update Employee Role': updateRole();
       break;
@@ -58,6 +58,41 @@ const userInterface = () => {
     }
   });
 };
+// For loops to create array for inquirer choices
+// Manager array created for inquirer choice
+let managerArray = [];
+function managerLoop() {
+  db.query(`SELECT first_name FROM employee`, function(err, res) {
+    if (err) throw err;
+    for(let i = 0; i < res.length; i++) {
+      managerArray.push(res[i].first_name);
+    }
+  })
+  return managerArray;
+};
+
+// Role array created from for loop
+let roleArray = [];
+function roleLoop() {
+  db.query(`SELECT role.title FROM role`, function(err, res) {
+    if (err) throw err;
+    for(let i = 0; i < res.length; i++) {
+      roleArray.push(res[i].title);
+    }
+  })
+  return roleArray;
+}
+// Department array created from loop
+let depArray = [];
+function depLoop() {
+  db.query(`SELECT department.name FROM department`, function(err,res) {
+    if (err) throw err;
+    for(let i = 0; i < res.length; i++) {
+      depArray.push(res[i].name);
+    }
+  })
+  return depArray
+}
 
 // Function calls from userInterface
 // View all employees in the database
@@ -94,7 +129,7 @@ const viewRoles = () => {
   db.query(`SELECT role.id, 
   role.title AS Title, 
   role.salary AS Salary, 
-  department.name AS Department FROM role 
+  department.name AS Department FROM role
   INNER JOIN department on department.id = role.department_id`, 
   function(err, res){
     if (err) throw err;
@@ -118,24 +153,27 @@ const addEmployee = () => {
       message: `Please enter this employee's last name.`
     },
     {
-      type: 'input',
-      name: 'mangerId',
-      message: managerChoices()
+      type: 'list',
+      name: 'manager',
+      message: `Please select the manager of this employee.`,
+      choices: managerLoop()
     },
     {
       type: 'list',
       name: 'role',
       message: `Please select the title of this employee.`,
-      choices: roleChoices()
+      choices: roleLoop()
     }
   // Assign ID to new employee
   ]).then(function(answers) {
-    db.query('INSERT INTO employee SET ?', 
+    let managerName = managerLoop().indexOf(answer.manager) + 1;
+    let roleTitle = roleLoop().indexOf(answer.role) + 1;
+    db.query(`INSERT INTO employee SET ?`, 
       {
         first_name: answers.firstName,
         last_name: answers.lastName,
-        manager_id: answers.managerId,
-        role_id: roleId()
+        manager_id: managerName,
+        role_id: roleTitle
       }
     );
     userInterface();
@@ -163,13 +201,15 @@ const addRole = () => {
       type: 'list',
       name: 'inDepartment',
       message: `Please select which department this new role belongs to.`,
-      choices: departmentChoices()
+      choices: depLoop()
     },
   ]).then(function(answers) {
+    let depId = managerLoop().indexOf(answer.inDepartment) + 1;
     db.query('INSERT INTO role SET ?',
       {
         title: answers.newRole,
-        salary: answers.newSalary
+        salary: answers.newSalary,
+        department_id: depId
       }
     );
     userInterface();
