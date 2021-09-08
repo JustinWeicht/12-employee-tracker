@@ -19,7 +19,7 @@
   
   ## Installation 
   - Install MySQL
-  - In the terminal enter: git pull git@github.com:JustinWeicht/12-employee-tracker.git
+  - In the terminal enter: git clone git@github.com:JustinWeicht/12-employee-tracker.git
   - Follow the video demonstration
 
   ## License
