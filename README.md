@@ -20,10 +20,10 @@
   ## Installation 
   - Install MySQL
   - In the terminal enter: git pull git@github.com:JustinWeicht/12-employee-tracker.git
-  - Follow the video demonstration.
+  - Follow the video demonstration
 
   ## License
-  This application uses the MIT license
+  This application uses the MIT license.
 
   ## Testing
   No tests were used in this application.
