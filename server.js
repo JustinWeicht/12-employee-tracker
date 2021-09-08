@@ -35,6 +35,7 @@ const userInterface = async () => {
         'Add Role',
         'Add Employee', 
         `Update Employee's Role`,
+        `Update Employee's Manager`,
         'Remove Employee',
         'Remove Role',
         'Remove Department',
@@ -56,7 +57,9 @@ const userInterface = async () => {
       break;
       case 'Add Employee': addEmployee();
       break;
-      case `Update Employees' Role`: updateRole();
+      case `Update Employee's Role`: updateRole();
+      break;
+      case `Update Employee's Manager`: updateManager();
       break;
       case 'Remove Employee': removeEmployee(); 
       break;
@@ -222,7 +225,7 @@ const updateRole = async () => {
       {
         type: 'list',
         name: 'selectEmployee',
-        message: `Which employee's role do you want to update?`,
+        message: `Please select the employee you want to update.`,
         choices: employees.map(employee => {
           return {
             name:`${employee.first_name} ${employee.last_name}`,
@@ -235,8 +238,8 @@ const updateRole = async () => {
     const roleAnswer = await inquirer.prompt([
       {
         type: 'list',
-        name: 'updatedRole',
-        message: `What role do you want to assign the selected employee?`,
+        name: 'updateRole',
+        message: `Please select the updated role for the selected employee.`,
         choices: roles.map(role => {
           return {
             name:`${role.title}`,
@@ -244,17 +247,58 @@ const updateRole = async () => {
           }
         })
       }
-    ]).then(function(answer) {
-      db.query(`UPDATE employee SET role_id = ? WHERE id = ?`, [
-        employeeAnswer.selectEmployee,
-        roleAnswer.updatedRole
-      ]);
-      console.log(`${answer.selectEmployee} was updated successfully.\n`);
-      userInterface();
-    });
+    ])
+    let result = await db.query("UPDATE employee SET ? WHERE ?", [
+      { role_id: roleAnswer.updateRole },
+      { id: employeeAnswer.selectEmployee }
+    ]);
+    console.log(`$The employee's role was updated successfully.\n`);
+    userInterface();
   } catch (err) {
-      console.log(err);
-      userInterface();
+    console.log(err);
+    userInterface();
+  };
+};
+
+// Update an employee's role
+const updateManager = async () => {
+  try {
+    const employees = await db.query("SELECT * FROM employee");
+    const employeeAnswer = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'selectEmployee',
+        message: `Please select the employee you want to update.`,
+        choices: employees.map(employee => {
+          return {
+            name:`${employee.first_name} ${employee.last_name}`,
+            value:employee.id
+          }
+        })
+      }
+    ]);
+    const managerAnswer = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'updateManager',
+        message: `Please select the updated manager for the selected employee.`,
+        choices: employees.map(employee => {
+          return {
+            name:`${employee.first_name} ${employee.last_name}`,
+            value:employee.id
+          }
+        })
+      }
+    ])
+    let result = await db.query("UPDATE employee SET ? WHERE ?", [
+      { manager_id: managerAnswer.updateManager },
+      { id: employeeAnswer.selectEmployee }
+    ]);
+    console.log(`The employee's manager was updated successfully.\n`);
+    userInterface();
+  } catch (err) {
+    console.log(err);
+    userInterface();
   };
 };
 
@@ -266,12 +310,12 @@ const removeEmployee = async () => {
       {
         type: 'list',
         name: 'removeEmployee',
-        message: `Which employee's role do you want to update?`,
+        message: `Please select the employee you want to delete.`,
         choices: employees.map(employee => ({name:`${employee.first_name} ${employee.last_name}`, value:employee.id})),
       }
     ]).then(function(answer) {
       db.query('DELETE FROM employee WHERE ?', {id: answer.removeEmployee});
-      console.log(`${answer.removeEmployee} was deleted successfully.\n`);
+      console.log(`The employee was deleted successfully.\n`);
       userInterface();
     });
   } catch (err) {
@@ -293,7 +337,7 @@ const removeRole = async () => {
       }
     ]).then(function(answer) {
       db.query('DELETE FROM role WHERE ?', {id: answer.removeRole});
-      console.log(`${answer.removeRole} was deleted successfully.\n`);
+      console.log(`The role was deleted successfully.\n`);
       userInterface();
     });
   } catch (err) {
@@ -315,7 +359,7 @@ const removeDepartment = async () => {
       }
     ]).then(function(answer) {
       db.query('DELETE FROM department WHERE ?', {id: answer.removeDepartment});
-      console.log(`${answer.removeDepartment} was deleted successfully.\n`);
+      console.log(`The department was deleted successfully.\n`);
       userInterface();
     });
   } catch (err) {
